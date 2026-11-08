@@ -7,12 +7,15 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Java
@@ -25,7 +28,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            aidl \
             git zip unzip \
             autoconf automake libtool pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
@@ -42,9 +44,25 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install buildozer cython==0.29.36
 
-      - name: Build Android APK
+      - name: Configure Android SDK
         run: |
-          buildozer android debug
+          mkdir -p "$HOME/.buildozer"
+          yes | buildozer android update || true
+
+      - name: Accept Android SDK licences
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+      - name: Install Android SDK components
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "cmdline-tools;latest"
+
+      - name: Build APK
+        run: buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
