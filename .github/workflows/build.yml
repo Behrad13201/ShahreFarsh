@@ -32,7 +32,7 @@ jobs:
             autoconf automake libtool pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
             cmake libffi-dev libssl-dev \
-            build-essential
+            build-essential lld
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -44,25 +44,13 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install buildozer cython==0.29.36
 
-      - name: Configure Android SDK
+      - name: Clean previous Android build
         run: |
-          mkdir -p "$HOME/.buildozer"
-          yes | buildozer android update || true
+          rm -rf .buildozer bin
 
-      - name: Accept Android SDK licences
+      - name: Build Android APK
         run: |
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
-
-      - name: Install Android SDK components
-        run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            "cmdline-tools;latest"
-
-      - name: Build APK
-        run: buildozer -v android debug
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
