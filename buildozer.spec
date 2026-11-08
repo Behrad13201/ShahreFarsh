@@ -9,14 +9,14 @@ source.dir = .
 source.include_exts = py,png,jpg,jpeg,mp3,kv,atlas
 version = 1.0
 
-requirements = python3==3.12.10,kivy==2.3.1
+requirements = python3,kivy==2.3.1
 
 orientation = landscape
 fullscreen = 1
 
 android.api = 35
 android.minapi = 23
-android.ndk = 27c
+android.ndk = 28c
 android.archs = arm64-v8a
 android.accept_sdk_license = True
 
